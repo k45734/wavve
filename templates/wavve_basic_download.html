@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block content %}
+<form>
+  {{ macros.setting_input_text_and_buttons('url', 'URL or Code', [['analyze_btn', '분석'], ['globalOpenBtn', '웨이브', [['url','https://www.wavve.com/index.html']] ]], value=arg['basic_recent_code'], desc='URL & Program Code & Episode Code & Movie Code') }}
+</form>
+<div id='detail'></div>
+<div id="more"></div>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  if ( "{{arg['code']}}" != "None" && "{{arg['code']}}" != "" ) {
+    $("#url").val("{{arg['code']}}");
+    $("#analyze_btn").click();
+  }
+});
+
+
+$("body").on('click', '#analyze_btn', function(e) {
+  e.preventDefault();
+  if ($("#url").val() == "") {
+    $.notify('<strong>URL이나 Code를 입력하세요.</strong>', {
+      type: 'warning'
+    });
+    return;
+  }
+  globalSendCommand('analyze', $("#url").val(), null, null, null, function(ret){
+    make_analyse_result(ret);
+  });
+});
+
+
+
+
+// 에피소드 서치
+$("body").on('click', '#episode_search_btn', function(e){
+  e.preventDefault();
+  contentid = $(this).data('code');
+  $("#url").val(contentid);
+  $("#analyze_btn").click();
+});
+
+
+//에피소드 다운로드 시작
+$("body").on('click', '#download_start_btn', function(e){
+  e.preventDefault();
+  globalSendCommand('download_start', $(this).data('url'), $(this).data('filename'), $(this).data('action'));
+});
+
+
+// 프로그램 서치
+$("body").on('click', '#program_search_btn', function(e){
+  e.preventDefault();
+  $("#url").val($(this).data('code'));
+  $("#analyze_btn").click();
+});
+
+
+// 프로그램 More 버튼
+$("body").on('click', '#more_btn', function(e){
+  e.preventDefault();
+  code = current_data.code;
+  page = parseInt($(this).data('page')) + 1;
+  globalSendCommand('program_page', code, page, null, null, function(ret){
+    make_program_page(ret);
+  });
+});
+
+$("body").on('change', '#select_quality', function(e){
+  e.preventDefault();
+  globalSendCommand('analyze', $("#url").val(), $('#select_quality').val(), null, null, function(ret){
+    make_analyse_result(ret);
+  });
+});
+
+// 다음 영화 검색
+$("body").on('click', '#daum_search_btn', function(e){
+  e.preventDefault();
+  title = $(this).data('title');
+  window.open('https://search.daum.net/search?w=tot&q=' + title, '_blank'); 
+});
+
+function make_program_page(ret) {
+  data = ret.data.list
+  str = '<hr>';
+  for (i in data) {
+    str += j_row_start();
+    tmp = '<img src="http://' + data[i].image + '" class="img-fluid">'
+    str += j_col(3, tmp)
+    tmp = '<strong>' + data[i].programtitle+' ' + data[i].episodenumber + '회</strong><br>';
+    tmp += data[i].episodetitle + '<br>';
+    tmp += data[i].releasedate + '<br><p></p>';
+    tmp += j_button('episode_search_btn', '에피소드', {'code':data[i].contentid});
+    str += j_col(9, tmp)
+    str += j_row_end();
+    if (i != data.length -1) str += j_hr(0);
+  }
+  if (ret.page == '1') {
+    document.getElementById("detail").innerHTML = str;
+  } else {
+    document.getElementById("detail").innerHTML += str;
+  }
+
+  if (parseInt(ret.data.pagecount) > parseInt(ret.data.count)) {
+    str = '<div class="d-inline-block"></div><form>';
+    str += '<button id="more_btn" class="btn btn-outline-secondary btn-lg btn-block" type="button" data-code="'+ret.code+'" data-page="'+ret.page+'">More</button>'
+    str += '</form>';
+    document.getElementById("more").innerHTML = str;
+  } else {
+    document.getElementById("more").innerHTML = '';
+  }
+}
+
+function make_analyse_result(data) {
+  if (data == null) {
+    $.notify('<strong>웨이브에서 정보를 가져올 수 없습니다.<br>잠시 후 이용하세요.</strong>', {
+      type: 'warning'
+    });
+    return
+  }
+  current_data = data
+  if (data['url_type'] == 'None') {
+    $.notify('<strong>유효한 값이 아닙니다.</strong>', {
+      type: 'warning'
+    });
+  } else if (data['url_type'] == 'episode') {
+    str = j_row_start();
+    tmp = '<img src="http://' + data.episode.image + '" class="img-fluid">'
+    str += j_col(3, tmp)
+    tmp = '<strong>' + data.episode.programtitle+' ' + data.episode.episodenumber + '회</strong><br>';
+    tmp += data.episode.episodetitle + '<br>';
+    tmp += data.episode.releasedate + '<br>';
+    tmp += data.episode.synopsis + '<br><br>';
+    tmp += '파일명 : ' + data.available.filename;
+    if (data.available.action == 'dash') {
+      tmp += " (" + text_color('DRM') + ")";  
+    }
+    tmp += "<br><br>";
+    
+    if (data.available.preview) {
+      tmp += '다운로드 권한 없음<br><br>';
+      tmp2 = ''
+    } else {
+      tmp2 = '<div class="form-inline">'
+      tmp2 += '화질선택&nbsp;&nbsp;&nbsp;&nbsp;<select id="select_quality" name="select_quality" class="form-control form-control-sm">'
+      for (j in data.streaming.qualities.list) {
+        tmp2 += '<option value="'+data.streaming.qualities.list[j].id +'" '+((data.streaming.qualities.list[j].id == data.available.current_quality) ? 'selected' : '')+'>'+data.streaming.qualities.list[j].id +'</option>'
+      }
+      tmp2 += `</select>&nbsp;&nbsp;&nbsp;&nbsp;`
+      tmp2 += '</div>'
+      tmp2 += j_button('download_start_btn', '다운로드', {'filename':data.available.filename, 'url':data.streaming.playurl, 'action':data.available.action})
+    }
+    
+    tmp2 += j_button('program_search_btn', '프로그램 검색', {'code':data.episode.programid});
+    tmp += j_button_group(tmp2);
+    str += j_col(9, tmp);
+    str += j_row_end();
+    document.getElementById("detail").innerHTML = str;
+    document.getElementById("more").innerHTML = '';
+  } else if (data['url_type'] == 'program') {
+    make_program_page(data);
+  } else if (data['url_type'] == 'movie') {
+    str = j_row_start();
+    tmp = '<img src="http://' + data.info.image + '" class="img-fluid">'
+    str += j_col(3, tmp)
+    tmp = '<strong>' + data.info.title + '</strong><br>';
+    tmp += data.info.releasedate + '<br>';
+    tmp += data.info.synopsis + '<br><br>';
+    tmp += '파일명 : ' + data.available.filename;
+    if (data.available.action == 'dash') {
+      tmp += " (" + text_color('DRM') + ")";  
+    }
+    tmp += "<br><br>";
+    if (data.available.preview) {
+      tmp += '다운로드 권한 없음<br><br>';
+      tmp2 = ''
+    } else {
+      tmp2 = '<div class="form-inline">'
+      tmp2 += '화질선택&nbsp;&nbsp;&nbsp;&nbsp;<select id="select_quality" name="select_quality" class="form-control form-control-sm">'
+      for (j in data.streaming.qualities.list) {
+        tmp2 += '<option value="'+data.streaming.qualities.list[j].id +'" '+((data.streaming.qualities.list[j].id == data.available.current_quality) ? 'selected' : '')+'>'+data.streaming.qualities.list[j].id +'</option>'
+      }
+      tmp2 += `</select>&nbsp;&nbsp;&nbsp;&nbsp;`
+      tmp2 += '</div>'
+      tmp2 += j_button('download_start_btn', '다운로드', {'filename':data.available.filename, 'url':data.streaming.playurl, 'action':data.available.action})
+    }
+    tmp2 += j_button('daum_search_btn', 'Daum 검색', {'title':data.info.title})
+    tmp += j_button_group(tmp2)
+    str += j_col(9, tmp)
+    str += j_row_end();
+    document.getElementById("detail").innerHTML = str;
+    document.getElementById("more").innerHTML = '';
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>    
+{% endblock %}
