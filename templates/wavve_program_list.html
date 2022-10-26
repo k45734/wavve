@@ -122,7 +122,7 @@ const make_list = (data) => {
     }else{
       tmp = `${data[i].program_title} - ${data[i].episode_number}`
     }
-    str += j_col(3, `${tmp}<br>
+    str += j_col(6, `${tmp}<br>
                      ${data[i].quality}<br><br>
                      ${j_button('request_btn', '프로그램 검색', 
                       {'program_id':data[i].program_id})}
