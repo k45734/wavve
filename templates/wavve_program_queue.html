@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-{{ macros.m_button_group([['reset_btn', '초기화'], ['delete_completed_btn', '완료 목록 삭제'], ['globalLinkBtn', 'Go FFMPEG', [['url','/ffmpeg/download/list']] ]])}}
+{{ macros.m_button_group([['reset_btn', '초기화'], ['delete_completed_btn', '완료 목록 삭제'], ['globalLinkBtn', 'Go FFMPEG', [['url','/ffmpeg/download/list']]], ['globalLinkBtn', 'Go DRM 다운로드', [['url','/wv_tool/download/list']]] ])}}
 
 {{ macros.m_row_start('0') }}
 {{ macros.m_row_end() }}
