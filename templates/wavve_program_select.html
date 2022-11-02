@@ -20,7 +20,7 @@ $(document).ready(function(){
     $("#url").val("{{arg['code']}}");
     $("#analyze_btn").click();
   } else {
-    globalSendCommand('previous_analyze', null, null, null, null, function(ret){
+    globalSendCommand('previous_analyze', null, null, null, function(ret){
       if (ret.data != null) {
         make_program_page(ret.data);
       }
@@ -37,7 +37,7 @@ $("body").on('click', '#analyze_btn', function(e) {
     });
     return;
   }
-  globalSendCommand('analyze', $("#url").val(), null, null, null, function(ret){
+  globalSendCommand('analyze', $("#url").val(), null, null, function(ret){
     if (ret.url_type == 'episode') {
       $("#url").val(ret.episode.programid);
       $("#analyze_btn").click();
@@ -147,7 +147,7 @@ $("body").on('click', '#all_quality_btn', function(e){
 $("body").on('click', '#quality_list_btn', function(e){
   e.preventDefault();
   code = $(this).data('code');
-  globalSendCommand('get_contents', code, null, null, null, function(data){
+  globalSendCommand('get_contents', code, null, null, function(data){
     if (data != null) {
       data = data['qualities']['list']
       str = ''
@@ -167,7 +167,7 @@ $("body").on('click', '#more_btn', function(e){
   e.preventDefault();
   //code = current_data.code;
   page = parseInt($(this).data('page')) + 1;
-  globalSendCommand('program_page', $(this).data('code'), page, null, null, function(ret){
+  globalSendCommand('program_page', $(this).data('code'), page, null, function(ret){
     make_program_page(ret);
   });
 });

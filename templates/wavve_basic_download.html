@@ -24,7 +24,7 @@ $("body").on('click', '#analyze_btn', function(e) {
     });
     return;
   }
-  globalSendCommand('analyze', $("#url").val(), null, null, null, function(ret){
+  globalSendCommand('analyze', $("#url").val(), null, null, function(ret){
     make_analyse_result(ret);
   });
 });
@@ -61,14 +61,14 @@ $("body").on('click', '#more_btn', function(e){
   e.preventDefault();
   code = current_data.code;
   page = parseInt($(this).data('page')) + 1;
-  globalSendCommand('program_page', code, page, null, null, function(ret){
+  globalSendCommand('program_page', code, page, null, function(ret){
     make_program_page(ret);
   });
 });
 
 $("body").on('change', '#select_quality', function(e){
   e.preventDefault();
-  globalSendCommand('analyze', $("#url").val(), $('#select_quality').val(), null, null, function(ret){
+  globalSendCommand('analyze', $("#url").val(), $('#select_quality').val(), null, function(ret){
     make_analyse_result(ret);
   });
 });
