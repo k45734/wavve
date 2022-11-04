@@ -16,38 +16,5 @@ $(document).ready(function(){
 });
 
 
-//설정 저장
-$("body").on('click', '#setting_save_btn', function(e){  
-  e.preventDefault();
-  var formData = get_formdata('#setting');
-  $.ajax({
-    url: '/' + package_name + '/ajax/setting_save',
-    type: "POST", 
-    cache: false,
-    data:formData,
-    dataType: "json",
-    success: function (ret) {
-      if (ret == 1) {
-        $.notify('<strong>설정과 로그인 정보를 저장하였습니다.</strong>', {
-          type: 'success'
-        });
-      } else if (ret == 2) {
-        $.notify('<strong>설정을 저장하였으나 로그인에 실패하였습니다.</strong>', {
-          type: 'warning'
-        });
-      } else if (ret) {
-        $.notify('<strong>설정을 저장하였습니다.</strong>', {
-          type: 'success'
-        });
-      } else {
-        $.notify('<strong>설정저장 실패하였습니다.</strong>', {
-          type: 'warning'
-        });
-      }
-    }
-  });
-});
-
-
 </script>    
 {% endblock %}
