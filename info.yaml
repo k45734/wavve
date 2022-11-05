@@ -8,5 +8,6 @@ more: "https://raw.githubusercontent.com/soju6jan/wavve/main/README.md"
 
 require_plugin: 
   - "https://github.com/soju6jan/sjva"
+  - "https://github.com/flaskfarm/support_site"
   - "https://github.com/flaskfarm/ffmpeg"
 
