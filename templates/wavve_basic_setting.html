@@ -4,6 +4,7 @@
 {{ macros.m_button_group([['globalSettingSaveBtn', '설정 저장']])}}
 {{ macros.m_row_start('5') }}
 {{ macros.m_row_end() }}
+{{ macros.m_hr() }}
 
 <form id="setting">
 {{ macros.setting_select('basic_quality', '기본 화질', [['2160p', '2160p'], ['1080p', '1080p'], ['720p', '720p'], ['480p', '480p'], ['360p', '360p']], col='3', value=arg['basic_quality']) }}
