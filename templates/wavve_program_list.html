@@ -70,7 +70,6 @@ $('body').on('click', '#db_remove_incomplete_btn', (e) => {
 
 $('body').on('click', '#db_add_incomplete_btn', (e) => {
   e.preventDefault();
-  console.log(current_page)
   globalSendCommand("program_list_command", "add_incomplete");
   globalRequestSearch(current_page);
 });
@@ -103,7 +102,6 @@ const make_list = (data) => {
   let str = '';
   let tmp = '';
   for (i in data) {
-    //console.log(data[i])
     str += j_row_start();
     str += j_col(1, data[i].id);
 

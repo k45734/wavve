@@ -27,20 +27,6 @@ $(document).ready(function(){
   socket.on('start', function(data){});
 
   socket.on('status', function(data){
-    /*
-    tmp = document.getElementById("progress_"+data.id);
-    if (tmp != null) {
-      document.getElementById("progress_"+data.id).style.width = data.data.percent+ '%';
-      document.getElementById("progress_"+data.id+"_label").innerHTML = data.status + "(" + data.data.percent + "%)";
-    }
-    tmp = '';
-    if ( data.is_downloading ) {
-      tmp = j_button('program_cancel_btn', '취소', {'id':data.id});
-      tmp = j_button_group(tmp);
-    }
-    console.log(data.is_downloading)
-    $("#button_" + data.id).html(tmp);
-    */
     str = make_item(data);
     $('#item_' + data.id).html(str);
 
@@ -53,7 +39,6 @@ function refresh() {
   globalSendCommand('queue_list', null, null, null, function(data) {
     current_data = data;
     $("#list_div").html('');
-    console.log(data)
     if (data.length == 0) {
       str = "<tr><td colspan='10'><h4>작업이 없습니다.</h4><td><tr>";
     } else {
@@ -72,7 +57,6 @@ function refresh() {
 
 function make_item(data) {
   str = '';
-  console.log(data);
   str += j_row_start();
   str += j_col(1, data.id);
   str += j_col(2, data.queue_created_time);
