@@ -44,6 +44,8 @@ setting = {
 from plugin import *
 
 DEFINE_DEV = False
+if os.path.exists(os.path.join(os.path.dirname(__file__), 'mod_basic.py')):
+    DEFINE_DEV = True
 
 P = create_plugin_instance(setting)
 try:
