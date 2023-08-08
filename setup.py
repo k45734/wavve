@@ -55,9 +55,28 @@ try:
         from .mod_recent import ModuleRecent
     else:
         from support import SupportSC
-        ModuleBasic = SupportSC.load_module_P(P, 'mod_basic').ModuleBasic
-        ModuleRecent = SupportSC.load_module_P(P, 'mod_recent').ModuleRecent
-        ModuleProgram = SupportSC.load_module_P(P, 'mod_program').ModuleProgram
+        mod_basic = SupportSC.load_module_P(P, 'mod_basic')
+        mod_recent = SupportSC.load_module_P(P, 'mod_recent')
+        mod_program = SupportSC.load_module_P(P, 'mod_program')
+        ModuleBasic = mod_basic.ModuleBasic
+        ModuleRecent = mod_recent.ModuleRecent
+        ModuleProgram = mod_program.ModuleProgram
+
+        import functools
+        def wrap_func(func, new_func):
+            @functools.wraps(func)
+            def run(*args, **kwargs):
+                new_func(*args, **kwargs)
+                return func(*args, **kwargs)
+            return run
+
+        def prefix_func(*args, **kwargs):
+            P.logger.debug(f'programtitle: {args[0].programtitle}')
+            P.logger.debug(f'filename: {args[0].filename}')
+            if args[0].filename.startswith('.'):
+                args[0].filename = args[0].programtitle + args[0].filename
+
+        mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, prefix_func)
     
     P.set_module_list([ModuleBasic, ModuleRecent, ModuleProgram])
 except Exception as e:
