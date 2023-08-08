@@ -70,13 +70,22 @@ try:
                 return func(*args, **kwargs)
             return run
 
-        def prefix_func(*args, **kwargs):
+        def hook_recent(*args, **kwargs):
             P.logger.debug(f'programtitle: {args[0].programtitle}')
             P.logger.debug(f'filename: {args[0].filename}')
             if args[0].filename.startswith('.'):
                 args[0].filename = args[0].programtitle + args[0].filename
 
-        mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, prefix_func)
+        def hook_program(*args, **kwargs):
+            if args[0].contents_json:
+                P.logger.debug(f'programtitle: {args[0].program_title}')
+                P.logger.debug(f'episodetitle: {args[0].contents_json["episodetitle"]}')
+                if not args[0].program_title:
+                    args[0].program_title = args[0].contents_json.get('episodetitle', args[0].contents_json.get('seasontitle', args[0].contents_json['programid']))
+                    args[0].contents_json['programtitle'] = args[0].program_title
+
+        mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, hook_recent)
+        mod_program.ModelWavveProgram.save = wrap_func(mod_program.ModelWavveProgram.save, hook_program)
     
     P.set_module_list([ModuleBasic, ModuleRecent, ModuleProgram])
 except Exception as e:
