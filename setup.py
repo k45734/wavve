@@ -79,9 +79,9 @@ try:
         def hook_program(*args, **kwargs):
             if args[0].contents_json:
                 P.logger.debug(f'programtitle: {args[0].program_title}')
-                P.logger.debug(f'episodetitle: {args[0].contents_json["episodetitle"]}')
+                P.logger.debug(f'seasontitle: {args[0].contents_json["seasontitle"]}')
                 if not args[0].program_title:
-                    args[0].program_title = args[0].contents_json.get('episodetitle', args[0].contents_json.get('seasontitle', args[0].contents_json['programid']))
+                    args[0].program_title = args[0].contents_json.get('seasontitle', args[0].contents_json.get('episodetitle', args[0].contents_json['programid']))
                     args[0].contents_json['programtitle'] = args[0].program_title
 
         mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, hook_recent)
