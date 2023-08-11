@@ -70,6 +70,12 @@ try:
                 return func(*args, **kwargs)
             return run
 
+        def after_func(func, new_func):
+            @functools.wraps(func)
+            def run(*args, **kwargs):
+                return new_func(func(*args, **kwargs))
+            return run
+
         def hook_recent(*args, **kwargs):
             P.logger.debug(f'programtitle: {args[0].programtitle}')
             P.logger.debug(f'filename: {args[0].filename}')
@@ -84,8 +90,23 @@ try:
                     args[0].program_title = args[0].contents_json.get('seasontitle', args[0].contents_json.get('episodetitle', args[0].contents_json['programid']))
                     args[0].contents_json['programtitle'] = args[0].program_title
 
+        def hook_analyze(result):
+            if result.get('url_type') == 'episode':
+                if not result['episode']['programtitle']:
+                    result['episode']['programtitle'] = result['episode']['seasontitle']
+                    result['available']['filename'] = result['episode']['programtitle'] + result['available']['filename']
+            else:
+                P.logger.debug(result)
+            return result
+
         mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, hook_recent)
         mod_program.ModelWavveProgram.save = wrap_func(mod_program.ModelWavveProgram.save, hook_program)
+        mod_basic.ModuleBasic.analyze = after_func(mod_basic.ModuleBasic.analyze, hook_analyze)
+
+        from ffmpeg.custom_ffmpeg import SupportFfmpeg
+        mod_program.SupportFfmpeg = SupportFfmpeg
+        mod_basic.SupportFfmpeg = SupportFfmpeg
+        mod_recent.SupportFfmpeg = SupportFfmpeg
     
     P.set_module_list([ModuleBasic, ModuleRecent, ModuleProgram])
 except Exception as e:
