@@ -91,7 +91,7 @@ try:
                     args[0].contents_json['programtitle'] = args[0].program_title
 
         def hook_analyze(result):
-            if result.get('url_type') == 'episode':
+            if not result and result.get('url_type') == 'episode':
                 if not result['episode']['programtitle']:
                     result['episode']['programtitle'] = result['episode']['seasontitle']
                     result['available']['filename'] = result['episode']['programtitle'] + result['available']['filename']
