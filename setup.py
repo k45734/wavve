@@ -96,6 +96,7 @@ try:
                     result['episode']['programtitle'] = result['episode']['seasontitle']
                     result['available']['filename'] = result['episode']['programtitle'] + result['available']['filename']
             else:
+                pass
                 P.logger.debug(result)
             return result
 
