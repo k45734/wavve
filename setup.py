@@ -95,9 +95,6 @@ try:
                 if not result['episode']['programtitle']:
                     result['episode']['programtitle'] = result['episode']['seasontitle']
                     result['available']['filename'] = result['episode']['programtitle'] + result['available']['filename']
-            else:
-                pass
-                P.logger.debug(result)
             return result
 
         mod_recent.ModelWavveRecent.save = wrap_func(mod_recent.ModelWavveRecent.save, hook_recent)
